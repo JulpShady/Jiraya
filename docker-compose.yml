@@ -14,9 +14,28 @@ services:
       - ${PATH_MEDIA}:/home/media/data/downloads
       - ${PATH_MEDIA}:/home/media/data/
 
-  jackett:
-    image: linuxserver/jackett:latest
-    container_name: jackett
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=Europe/Paris
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/media/deluge/config:/config
+      - ${PATH_MEDIA}:/home/media/data/downloads
+      - ${PATH_MEDIA}:/home/media/data/
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
     restart: unless-stopped
     network_mode: "host"
     environment:
@@ -24,8 +43,10 @@ services:
       - PGID=${PGID}
       - TZ=Europe/Paris
     volumes:
-      - /home/media/jackett/config:/config
+      - /home/media/prowlarr/config:/config
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9696:9696
 
   sonarr:
     image: linuxserver/sonarr:latest
@@ -91,6 +112,20 @@ services:
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/London
+      - LANG=en_GB
     ports:
       - "${PORT:-8191}:8191"
-    restart: unless-stopped 
+    restart: unless-stopped
+
+  # https://hub.docker.com/r/itsthenetwork/nfs-server-alpine
+  nfs:
+    image: itsthenetwork/nfs-server-alpine:12
+    container_name: nfs
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - SHARED_DIRECTORY=/home/media/data/
+    volumes:
+      - /data/nfs-storage:/home/media/data/
+    ports:
+      - 2049:2049
