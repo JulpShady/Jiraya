@@ -26,12 +26,31 @@ services:
     volumes:
       - /home/media/deluge/config:/config
       - ${PATH_MEDIA}:/home/media/data/downloads
-      - ${PATH_MEDIA}:/home/media/data/
+      - ${PATH_MEDIA}:/home/media/data/*
     ports:
       - 8080:8080
       - 6881:6881
       - 6881:6881/udp
     restart: unless-stopped
+  
+  ygg-rss-proxy:
+    image: ghcr.io/limedrive/ygg-rss-proxy:latest
+    container_name: ygg-rss-proxy
+    expose:
+      - 8080
+    environment:
+      TZ: Europe/Paris
+      YGG_USER: 'julpshady'
+      YGG_PASS: 'B1p1n>>)h*)[ydhs=QN5'
+      FLARESOLVERR_HOST: flaresolverr
+      RSS_HOST: ygg-rss-proxy
+      RSS_PORT: 8080
+      LOG_LEVEL: INFO
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
