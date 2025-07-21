@@ -14,25 +14,6 @@ services:
       - ${PATH_MEDIA}:/home/media/data/downloads
       - ${PATH_MEDIA}:/home/media/data/
 
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=Europe/Paris
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
-    volumes:
-      - /home/media/deluge/config:/config
-      - ${PATH_MEDIA}:/home/media/data/downloads
-      - ${PATH_MEDIA}:/home/media/data/*
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -105,7 +86,9 @@ services:
 
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: 21hsmw/flaresolverr:nodriver
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    # alexfozor/flaresolverr:pr-1300-experimental
+    # 21hsmw/flaresolverr:nodriver
     # ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     environment:
@@ -117,16 +100,3 @@ services:
     ports:
       - "${PORT:-8191}:8191"
     restart: unless-stopped
-
-  # https://hub.docker.com/r/itsthenetwork/nfs-server-alpine
-  nfs:
-    image: itsthenetwork/nfs-server-alpine:12
-    container_name: nfs
-    restart: unless-stopped
-    privileged: true
-    environment:
-      - SHARED_DIRECTORY=/home/media/data/
-    volumes:
-      - /data/nfs-storage:/home/media/data/
-    ports:
-      - 2049:2049
