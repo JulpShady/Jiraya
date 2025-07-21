@@ -86,7 +86,7 @@ services:
 
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: 21hsmw/flaresolverr:nodriver
     # alexfozor/flaresolverr:pr-1300-experimental
     # 21hsmw/flaresolverr:nodriver
     # ghcr.io/flaresolverr/flaresolverr:latest
