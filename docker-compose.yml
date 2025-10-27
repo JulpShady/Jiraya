@@ -15,7 +15,8 @@ services:
       - ${PATH_MEDIA}:/home/media/data/
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: ghcr.io/almottier/prowlarr-ygg
+    # lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
     network_mode: "host"
@@ -26,6 +27,7 @@ services:
     volumes:
       - /home/media/prowlarr/config:/config
       - /etc/localtime:/etc/localtime:ro
+      #- ./Partage/*:/config/Definitions/Custom/:ro
     ports:
       - 9696:9696
 
