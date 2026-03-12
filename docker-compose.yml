@@ -13,6 +13,48 @@ services:
       - /home/media/deluge/config:/config
       - ${PATH_MEDIA}:/home/media/data/downloads
       - ${PATH_MEDIA}:/home/media/data/
+  
+  ygege:
+      image: uwucode/ygege:latest
+      container_name: ygege
+      restart: unless-stopped
+      # Optional: Run with specific user ID (already runs as non-root UID 10001 by default)
+      # user: "1000:1000"
+      environment:
+        BIND_IP: "0.0.0.0"                                     # Optional: IP to bind (default: 0.0.0.0)
+        BIND_PORT: "8715"                                    # Optional: Internal port (default: 8715)
+        LOG_LEVEL: "info"                                    # Optional: Log level (default: info)
+        # TMDB_TOKEN: "your_token"                             # Optional: TMDB API token for IMDB/TMDB lookups
+        RELAY_URL: "wss://relay.ygg.gratis"                  # Optional: Nostr relay URL (default: wss://relay.ygg.gratis)
+      volumes:
+        - ./ygege/config.json:/app/config.json:ro # Optional: read-only config file
+      ports:
+        - "8715:8715"                            # Change CONTAINER_PORT to match BIND_PORT env var
+      healthcheck:
+        test: ["CMD-SHELL", "curl --fail http://localhost:$${BIND_PORT:-8715}/health || exit 1"]
+        interval: 1m30s
+        timeout: 20s
+        retries: 3
+        start_period: 10s
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - WEBUI_PORT=8181
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/media/qbittorrent/config:/config
+      - ${PATH_MEDIA}:/home/media/data/downloads
+      - ${PATH_MEDIA}:/home/media/data/
+    ports:
+      - 8181:8181
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
 
   prowlarr:
     image: ghcr.io/almottier/prowlarr-ygg
